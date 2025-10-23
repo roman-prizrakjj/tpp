@@ -86,38 +86,67 @@ class KanbanBoard {
         // Панорамирование мышью
         const board = document.getElementById('kanban-board');
         
+        // Устанавливаем курсор grab по умолчанию
+        board.style.cursor = 'grab';
+        
         board.addEventListener('mousedown', (e) => {
+            // Предотвращаем панорамирование при клике на карточки или кнопки
+            if (e.target.closest('.kanban-card') || e.target.closest('button')) {
+                return;
+            }
+            
             this.isDragging = true;
-            this.startX = e.pageX - board.offsetLeft;
-            this.startY = e.pageY - board.offsetTop;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
             this.scrollLeft = board.scrollLeft;
             this.scrollTop = board.scrollTop;
             board.style.cursor = 'grabbing';
+            
+            // Предотвращаем выделение текста при перетаскивании
+            e.preventDefault();
         });
 
         document.addEventListener('mousemove', (e) => {
             if (!this.isDragging) return;
             e.preventDefault();
-            const x = e.pageX - board.offsetLeft;
-            const y = e.pageY - board.offsetTop;
-            const walkX = (x - this.startX) * 2;
-            const walkY = (y - this.startY) * 2;
-            board.scrollLeft = this.scrollLeft - walkX;
-            board.scrollTop = this.scrollTop - walkY;
+            
+            // Вычисляем смещение мыши
+            const deltaX = e.clientX - this.startX;
+            const deltaY = e.clientY - this.startY;
+            
+            // Применяем смещение к скроллу (инвертируем для естественного движения)
+            board.scrollLeft = this.scrollLeft - deltaX;
+            board.scrollTop = this.scrollTop - deltaY;
         });
 
         document.addEventListener('mouseup', () => {
-            this.isDragging = false;
-            board.style.cursor = 'grab';
+            if (this.isDragging) {
+                this.isDragging = false;
+                board.style.cursor = 'grab';
+            }
+        });
+        
+        // Останавливаем панорамирование при уходе мыши за пределы окна
+        document.addEventListener('mouseleave', () => {
+            if (this.isDragging) {
+                this.isDragging = false;
+                board.style.cursor = 'grab';
+            }
         });
 
         // Зум колесом мыши
         board.addEventListener('wheel', (e) => {
             e.preventDefault();
+            
+            // Получаем координаты мыши относительно канбан-доски
+            const rect = board.getBoundingClientRect();
+            const centerX = e.clientX - rect.left;
+            const centerY = e.clientY - rect.top;
+            
             if (e.deltaY < 0) {
-                this.zoomIn();
+                this.zoomInAtPoint(centerX, centerY);
             } else {
-                this.zoomOut();
+                this.zoomOutAtPoint(centerX, centerY);
             }
         });
 
@@ -199,13 +228,31 @@ class KanbanBoard {
         this.setZoom(newZoom);
     }
 
+    zoomInAtPoint(centerX, centerY) {
+        const newZoom = Math.min(this.maxZoom, this.zoom + this.zoomStep);
+        this.setZoom(newZoom, centerX, centerY);
+    }
+
+    zoomOutAtPoint(centerX, centerY) {
+        const newZoom = Math.max(this.minZoom, this.zoom - this.zoomStep);
+        this.setZoom(newZoom, centerX, centerY);
+    }
+
     resetZoom() {
         this.setZoom(1);
     }
 
-    setZoom(zoom) {
+    setZoom(zoom, centerX = null, centerY = null) {
         this.zoom = zoom;
         const board = document.getElementById('kanban-board');
+        
+        // Устанавливаем точку зума по центру или по указанным координатам
+        if (centerX !== null && centerY !== null) {
+            board.style.transformOrigin = `${centerX}px ${centerY}px`;
+        } else {
+            board.style.transformOrigin = 'center center';
+        }
+        
         board.style.transform = `scale(${zoom})`;
         
         // Обновление кнопки сброса зума
