@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кибербезопасность - Интерактивная панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+</head>
+<body>
+    <!-- Скринсейвер -->
+    <div id="screensaver" class="screensaver">
+        <video id="screensaver-video" autoplay muted loop>
+            <source src="assets/screensaver.webm" type="video/webm">
+            Ваш браузер не поддерживает видео.
+        </video>
+        <div class="screensaver-overlay">
+            <h1>Кибербезопасность</h1>
+            <p>Коснитесь экрана для продолжения</p>
+        </div>
+    </div>
+
+    <!-- Главное приложение -->
+    <div id="app" class="app hidden">
+        <!-- Навигационный экран -->
+        <div id="navigation" class="screen navigation-screen active">
+            <header class="app-header">
+                <h1>Кибербезопасность</h1>
+                <button id="screensaver-btn" class="screensaver-btn" title="Запустить скринсейвер">⏸</button>
+            </header>
+            
+            <div class="navigation-grid">
+                <button class="nav-tile" data-screen="dashboards">
+                    <div class="tile-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v5h5V3H3zM16 3v5h5V3h-5zM16 16v5h5v-5h-5zM3 16v5h5v-5H3z"/>
+                            <path d="M9 9h6v6H9V9z"/>
+                        </svg>
+                    </div>
+                    <h3>Дашборды статистики</h3>
+                    <p>Аналитика компьютерных инцидентов</p>
+                </button>
+                
+                <button class="nav-tile" data-screen="presentation1">
+                    <div class="tile-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h3>Угрозы и защита</h3>
+                    <p>Современные киберугрозы</p>
+                </button>
+                
+                <button class="nav-tile" data-screen="presentation2">
+                    <div class="tile-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <circle cx="12" cy="16" r="1"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </div>
+                    <h3>Безопасность данных</h3>
+                    <p>Защита информации</p>
+                </button>
+                
+                <button class="nav-tile" data-screen="presentation3">
+                    <div class="tile-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <h3>Инцидент-менеджмент</h3>
+                    <p>Реагирование на инциденты</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Экран дашбордов -->
+        <div id="dashboards" class="screen dashboard-screen">
+            <header class="screen-header">
+                <button class="home-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    Главная
+                </button>
+                <h2>Дашборды статистики</h2>
+                <button id="screensaver-btn-dash" class="screensaver-btn" title="Запустить скринсейвер">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </button>
+            </header>
+            
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="incidents">Компьютерные инциденты</button>
+                <button class="tab-btn" data-tab="sectors">По отраслям</button>
+                <button class="tab-btn" data-tab="motivation">По мотивации</button>
+                <button class="tab-btn" data-tab="vendors">Импортозамещение</button>
+                <button class="tab-btn" data-tab="ai-security">ИИ в защите</button>
+                <button class="tab-btn" data-tab="kanban">Канбан-доска</button>
+            </div>
+            
+            <div class="dashboard-content">
+                <div id="tab-incidents" class="tab-content active">
+                    <div class="chart-container">
+                        <div id="incidents-chart"></div>
+                    </div>
+                    <div class="data-table">
+                        <table id="incidents-table"></table>
+                    </div>
+                </div>
+                
+                <div id="tab-sectors" class="tab-content">
+                    <div class="chart-container">
+                        <div id="sectors-chart"></div>
+                    </div>
+                    <div class="data-table">
+                        <table id="sectors-table"></table>
+                    </div>
+                </div>
+                
+                <div id="tab-motivation" class="tab-content">
+                    <div class="chart-container">
+                        <div id="motivation-chart"></div>
+                    </div>
+                    <div class="data-table">
+                        <table id="motivation-table"></table>
+                    </div>
+                </div>
+                
+                <div id="tab-vendors" class="tab-content">
+                    <div class="chart-container">
+                        <div id="vendors-chart"></div>
+                    </div>
+                    <div class="data-table">
+                        <table id="vendors-table"></table>
+                    </div>
+                </div>
+                
+                <div id="tab-ai-security" class="tab-content">
+                    <div class="chart-container">
+                        <div id="ai-security-chart"></div>
+                    </div>
+                    <div class="data-table">
+                        <table id="ai-security-table"></table>
+                    </div>
+                </div>
+                
+                <div id="tab-kanban" class="tab-content">
+                    <div class="kanban-container">
+                        <div class="kanban-controls">
+                            <button id="zoom-out">-</button>
+                            <button id="zoom-reset">100%</button>
+                            <button id="zoom-in">+</button>
+                        </div>
+                        <div id="kanban-board" class="kanban-board"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экраны презентаций -->
+        <div id="presentation1" class="screen presentation-screen">
+            <header class="screen-header">
+                <button class="home-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    Главная
+                </button>
+                <h2>Угрозы и защита</h2>
+                <button class="screensaver-btn" title="Запустить скринсейвер">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </button>
+            </header>
+            <div class="presentation-container">
+                <div class="slide-thumbnails" id="thumbnails1"></div>
+                <div class="slide-main">
+                    <div class="slide-viewer">
+                        <div id="slide1-content" class="slide-content"></div>
+                    </div>
+                    <div class="presentation-controls">
+                        <button id="prev-slide1" class="slide-btn">‹ Назад</button>
+                        <span id="slide1-counter" class="slide-counter">1 / 8</span>
+                        <button id="next-slide1" class="slide-btn">Вперед ›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="presentation2" class="screen presentation-screen">
+            <header class="screen-header">
+                <button class="home-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    Главная
+                </button>
+                <h2>Безопасность данных</h2>
+                <button class="screensaver-btn" title="Запустить скринсейвер">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </button>
+            </header>
+            <div class="presentation-container">
+                <div class="slide-thumbnails" id="thumbnails2"></div>
+                <div class="slide-main">
+                    <div class="slide-viewer">
+                        <div id="slide2-content" class="slide-content"></div>
+                    </div>
+                    <div class="presentation-controls">
+                        <button id="prev-slide2" class="slide-btn">‹ Назад</button>
+                        <span id="slide2-counter" class="slide-counter">1 / 7</span>
+                        <button id="next-slide2" class="slide-btn">Вперед ›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="presentation3" class="screen presentation-screen">
+            <header class="screen-header">
+                <button class="home-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                    </svg>
+                    Главная
+                </button>
+                <h2>Инцидент-менеджмент</h2>
+                <button class="screensaver-btn" title="Запустить скринсейвер">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </button>
+            </header>
+            <div class="presentation-container">
+                <div class="slide-thumbnails" id="thumbnails3"></div>
+                <div class="slide-main">
+                    <div class="slide-viewer">
+                        <div id="slide3-content" class="slide-content"></div>
+                    </div>
+                    <div class="presentation-controls">
+                        <button id="prev-slide3" class="slide-btn">‹ Назад</button>
+                        <span id="slide3-counter" class="slide-counter">1 / 9</span>
+                        <button id="next-slide3" class="slide-btn">Вперед ›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/presentations.js"></script>
+    <script src="js/kanban.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
