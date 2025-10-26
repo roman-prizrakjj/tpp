@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демо динамического обновления данных</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .demo-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 10px 15px; margin: 5px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a9e; }
+        .output { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; }
+        input[type="number"] { width: 80px; padding: 5px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Демо динамического обновления данных</h1>
+    <p>Эта страница демонстрирует как можно динамически изменять данные для графиков.</p>
+
+    <div class="demo-section">
+        <h3>📊 Управление данными инцидентов</h3>
+        <p>Текущие данные:</p>
+        <div id="current-incidents" class="output"></div>
+        
+        <h4>Добавить новый год:</h4>
+        <input type="number" id="new-year" placeholder="2026" value="2026">
+        <input type="number" id="new-incidents" placeholder="5000" value="5000">
+        <button onclick="addNewIncident()">Добавить инцидент</button>
+
+        <h4>Обновить все данные инцидентов:</h4>
+        <button onclick="updateIncidentsExample()">Обновить на тестовые данные</button>
+        <button onclick="resetIncidentsData()">Сбросить к исходным</button>
+    </div>
+
+    <div class="demo-section">
+        <h3>🏢 Управление данными секторов</h3>
+        <p>Текущие данные:</p>
+        <div id="current-sectors" class="output"></div>
+        
+        <button onclick="updateSectorsExample()">Обновить на новые сектора</button>
+        <button onclick="resetSectorsData()">Сбросить к исходным</button>
+    </div>
+
+    <div class="demo-section">
+        <h3>💾 Сохранение и загрузка</h3>
+        <button onclick="saveData()">Сохранить в localStorage</button>
+        <button onclick="loadData()">Загрузить из localStorage</button>
+        <button onclick="clearStorage()">Очистить localStorage</button>
+    </div>
+
+    <div class="demo-section">
+        <h3>🔗 Ссылка на приложение</h3>
+        <button onclick="openMainApp()">Открыть основное приложение</button>
+        <p><em>Откройте основное приложение и переключайтесь между графиками, чтобы увидеть изменения в реальном времени!</em></p>
+    </div>
+
+    <div id="console-output" class="output" style="max-height: 200px; overflow-y: scroll;"></div>
+
+    <script>
+        // Переопределяем console.log для отображения в интерфейсе
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const output = document.getElementById('console-output');
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML += `[${time}] ${args.join(' ')}\n`;
+            output.scrollTop = output.scrollHeight;
+        };
+
+        // Исходные данные для восстановления
+        const originalIncidentsData = {
+            years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+            incidents: [1264, 1508, 2271, 2418, 2921, 3286, 3813, 4324]
+        };
+
+        const originalSectorsData = {
+            sectors: ['Госучреждения', 'Промышленность', 'Здравоохранение', 'Финансовые организации', 'Наука и образование', 'IT-компании', 'Другие', 'Без привязки к отрасли', 'Торговля', 'Связь'],
+            values: [547, 516, 487, 427, 398, 321, 312, 306, 268, 232]
+        };
+
+        // Функции управления данными
+        function updateDisplay() {
+            // Обновляем отображение текущих данных
+            document.getElementById('current-incidents').textContent = 
+                `Годы: ${originalIncidentsData.years.join(', ')}\nИнциденты: ${originalIncidentsData.incidents.join(', ')}`;
+            
+            document.getElementById('current-sectors').textContent = 
+                `Секторы: ${originalSectorsData.sectors.length} элементов\nЗначения: ${originalSectorsData.values.join(', ')}`;
+        }
+
+        function addNewIncident() {
+            const year = parseInt(document.getElementById('new-year').value);
+            const incidents = parseInt(document.getElementById('new-incidents').value);
+            
+            if (year && incidents) {
+                // Используем постмессагинг для связи с основным приложением
+                const message = {
+                    type: 'addIncident',
+                    data: { year, incidents }
+                };
+                
+                // Если основное приложение открыто в другом окне
+                if (window.opener) {
+                    window.opener.postMessage(message, '*');
+                }
+                
+                // Локальное обновление для демо
+                originalIncidentsData.years.push(year);
+                originalIncidentsData.incidents.push(incidents);
+                updateDisplay();
+                
+                console.log(`✅ Добавлен инцидент: ${year} год - ${incidents} инцидентов`);
+            } else {
+                alert('Введите корректные значения года и количества инцидентов');
+            }
+        }
+
+        function updateIncidentsExample() {
+            const newData = {
+                years: [2020, 2021, 2022, 2023, 2024, 2025, 2026],
+                incidents: [2500, 3000, 3500, 4200, 4800, 5500, 6200]
+            };
+            
+            const message = {
+                type: 'updateIncidents',
+                data: newData
+            };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            Object.assign(originalIncidentsData, newData);
+            updateDisplay();
+            
+            console.log('✅ Данные инцидентов обновлены на тестовые');
+        }
+
+        function resetIncidentsData() {
+            const originalData = {
+                years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+                incidents: [1264, 1508, 2271, 2418, 2921, 3286, 3813, 4324]
+            };
+            
+            const message = {
+                type: 'updateIncidents',
+                data: originalData
+            };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            Object.assign(originalIncidentsData, originalData);
+            updateDisplay();
+            
+            console.log('✅ Данные инцидентов сброшены к исходным');
+        }
+
+        function updateSectorsExample() {
+            const newData = {
+                sectors: ['Энергетика', 'Транспорт', 'Банки', 'Телеком', 'Производство'],
+                values: [850, 720, 680, 520, 430]
+            };
+            
+            const message = {
+                type: 'updateSectors',
+                data: newData
+            };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            Object.assign(originalSectorsData, newData);
+            updateDisplay();
+            
+            console.log('✅ Данные секторов обновлены на новые');
+        }
+
+        function resetSectorsData() {
+            const originalData = {
+                sectors: ['Госучреждения', 'Промышленность', 'Здравоохранение', 'Финансовые организации', 'Наука и образование', 'IT-компании', 'Другие', 'Без привязки к отрасли', 'Торговля', 'Связь'],
+                values: [547, 516, 487, 427, 398, 321, 312, 306, 268, 232]
+            };
+            
+            const message = {
+                type: 'updateSectors',
+                data: originalData
+            };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            Object.assign(originalSectorsData, originalData);
+            updateDisplay();
+            
+            console.log('✅ Данные секторов сброшены к исходным');
+        }
+
+        function saveData() {
+            const message = { type: 'saveData' };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            console.log('💾 Команда сохранения отправлена');
+        }
+
+        function loadData() {
+            const message = { type: 'loadData' };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            console.log('📂 Команда загрузки отправлена');
+        }
+
+        function clearStorage() {
+            const message = { type: 'clearStorage' };
+            
+            if (window.opener) {
+                window.opener.postMessage(message, '*');
+            }
+            
+            console.log('🗑️ Команда очистки storage отправлена');
+        }
+
+        function openMainApp() {
+            window.open('index.html', '_blank');
+        }
+
+        // Инициализация
+        updateDisplay();
+        console.log('🚀 Демо страница инициализирована');
+        console.log('📝 Откройте основное приложение и тестируйте изменение данных в реальном времени!');
+    </script>
+</body>
+</html>

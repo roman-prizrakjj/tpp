@@ -291,6 +291,68 @@ window.addEventListener('error', (e) => {
     console.error('Ошибка приложения:', e.error);
 });
 
+// Обработчик сообщений для динамического обновления данных
+window.addEventListener('message', (event) => {
+    // Проверяем происхождение сообщения для безопасности
+    if (event.origin !== window.location.origin) {
+        return;
+    }
+    
+    const { type, data } = event.data;
+    
+    switch (type) {
+        case 'addIncident':
+            if (window.DataManager && data.year && data.incidents) {
+                DataManager.addIncident(data.year, data.incidents);
+                console.log(`📊 Добавлен новый инцидент: ${data.year} - ${data.incidents}`);
+            }
+            break;
+            
+        case 'updateIncidents':
+            if (window.DataManager && data) {
+                DataManager.updateIncidents(data.years, data.incidents);
+                console.log('📊 Данные инцидентов обновлены через сообщение');
+            }
+            break;
+            
+        case 'updateSectors':
+            if (window.DataManager && data) {
+                DataManager.updateSectors(data.sectors, data.values);
+                console.log('🏢 Данные секторов обновлены через сообщение');
+            }
+            break;
+            
+        case 'updateMotivations':
+            if (window.DataManager && data) {
+                DataManager.updateMotivations(data.motivations, data.values);
+                console.log('💡 Данные мотиваций обновлены через сообщение');
+            }
+            break;
+            
+        case 'saveData':
+            if (window.DataManager) {
+                DataManager.saveToStorage();
+                console.log('💾 Данные сохранены через сообщение');
+            }
+            break;
+            
+        case 'loadData':
+            if (window.DataManager) {
+                DataManager.loadFromStorage();
+                console.log('📂 Данные загружены через сообщение');
+            }
+            break;
+            
+        case 'clearStorage':
+            localStorage.removeItem('cyberSecurityData');
+            console.log('🗑️ Локальное хранилище очищено');
+            break;
+            
+        default:
+            console.log('❓ Неизвестный тип сообщения:', type);
+    }
+});
+
 // Предотвращение закрытия приложения
 window.addEventListener('beforeunload', (e) => {
     e.preventDefault();

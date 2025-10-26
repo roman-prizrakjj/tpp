@@ -537,3 +537,121 @@ const importSubstitutionData = {
     foreign: [30, 11, 4.2],
     domestic: [70, 89, 95.8]
 };
+
+// API для динамического обновления данных
+class DataManager {
+    // Обновить данные инцидентов
+    static updateIncidents(years, incidents) {
+        if (years) incidentsData.years = years;
+        if (incidents) incidentsData.incidents = incidents;
+        
+        // Автоматически обновить график если chartsManager доступен
+        if (window.chartsManager) {
+            chartsManager.updateIncidentsData({ years, incidents });
+        }
+        
+        console.log('Данные инцидентов обновлены:', { years, incidents });
+    }
+
+    // Обновить данные секторов  
+    static updateSectors(sectors, values) {
+        if (sectors) sectorsData.sectors = sectors;
+        if (values) sectorsData.values = values;
+        
+        // Автоматически обновить график если chartsManager доступен
+        if (window.chartsManager) {
+            chartsManager.updateSectorsData({ sectors, values });
+        }
+        
+        console.log('Данные секторов обновлены:', { sectors, values });
+    }
+
+    // Обновить данные мотиваций
+    static updateMotivations(motivations, values) {
+        if (motivations) motivationData.motivations = motivations;
+        if (values) motivationData.values = values;
+        
+        // Автоматически обновить график если chartsManager доступен
+        if (window.chartsManager) {
+            chartsManager.updateMotivationData({ motivations, values });
+        }
+        
+        console.log('Данные мотиваций обновлены:', { motivations, values });
+    }
+
+    // Добавить новый инцидент
+    static addIncident(year, count) {
+        incidentsData.years.push(year);
+        incidentsData.incidents.push(count);
+        
+        // Автоматически обновить график
+        if (window.chartsManager) {
+            chartsManager.createIncidentsChart();
+        }
+        
+        console.log(`Добавлен инцидент: ${year} - ${count}`);
+    }
+
+    // Получить текущие данные
+    static getData(type) {
+        switch(type) {
+            case 'incidents':
+                return incidentsData;
+            case 'sectors':
+                return sectorsData;
+            case 'motivation':
+                return motivationData;
+            case 'mitre':
+                return mitreData;
+            case 'kanban':
+                return kanbanData;
+            case 'import':
+                return importSubstitutionData;
+            default:
+                return null;
+        }
+    }
+
+    // Сохранить данные в localStorage
+    static saveToStorage() {
+        const allData = {
+            incidents: incidentsData,
+            sectors: sectorsData,
+            motivation: motivationData,
+            mitre: mitreData,
+            kanban: kanbanData,
+            importSubstitution: importSubstitutionData
+        };
+        
+        localStorage.setItem('cyberSecurityData', JSON.stringify(allData));
+        console.log('Данные сохранены в localStorage');
+    }
+
+    // Загрузить данные из localStorage
+    static loadFromStorage() {
+        const stored = localStorage.getItem('cyberSecurityData');
+        if (stored) {
+            const allData = JSON.parse(stored);
+            
+            // Обновить все данные
+            if (allData.incidents) Object.assign(incidentsData, allData.incidents);
+            if (allData.sectors) Object.assign(sectorsData, allData.sectors);
+            if (allData.motivation) Object.assign(motivationData, allData.motivation);
+            if (allData.mitre) Object.assign(mitreData, allData.mitre);
+            if (allData.kanban) Object.assign(kanbanData, allData.kanban);
+            if (allData.importSubstitution) Object.assign(importSubstitutionData, allData.importSubstitution);
+            
+            // Обновить все графики
+            if (window.chartsManager) {
+                chartsManager.refreshAllCharts();
+            }
+            
+            console.log('Данные загружены из localStorage');
+            return true;
+        }
+        return false;
+    }
+}
+
+// Экспорт для глобального доступа
+window.DataManager = DataManager;
